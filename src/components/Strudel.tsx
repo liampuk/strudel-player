@@ -18,8 +18,8 @@ function formatTime(seconds: number): string {
 }
 
 export default function Strudel() {
-  const initRef = useRef(false);
   const [ready, setReady] = useState(false);
+  const [unlocking, setUnlocking] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [scrubbing, setScrubbing] = useState(false);
@@ -30,11 +30,16 @@ export default function Strudel() {
     scrubbingRef.current = scrubbing;
   }, [scrubbing]);
 
-  useEffect(() => {
-    if (initRef.current) return;
-    initRef.current = true;
-    initStrudel().then(() => setReady(true));
-  }, []);
+  const handleUnlockAudio = async () => {
+    if (ready || unlocking) return;
+    setUnlocking(true);
+    try {
+      await initStrudel();
+      setReady(true);
+    } finally {
+      setUnlocking(false);
+    }
+  };
 
   useEffect(() => {
     const tick = () => {
@@ -78,7 +83,28 @@ export default function Strudel() {
   const remainingSeconds = Math.max(0, DURATION_SECONDS - elapsed);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#121212] text-white">
+    <div className="flex flex-col min-h-screen bg-[#121212] text-white relative">
+      {/* iOS audio unlock overlay - must tap to enable AudioContext */}
+      {!ready && (
+        <div
+          role="button"
+          tabIndex={0}
+          onPointerDown={handleUnlockAudio}
+          onKeyDown={(e) => e.key === 'Enter' && handleUnlockAudio()}
+          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#121212] px-6"
+          aria-label="Tap to enable audio"
+        >
+          <p className="text-lg text-white/90 text-center">
+            {unlocking ? 'Loading…' : 'Tap to enable audio'}
+          </p>
+          <p className="text-sm text-white/50 text-center mt-2 max-w-[260px]">
+            {unlocking
+              ? 'Preparing sounds…'
+              : 'Required for playback on mobile devices'}
+          </p>
+        </div>
+      )}
+
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-[#121212] shrink-0">
         <button
@@ -106,7 +132,7 @@ export default function Strudel() {
       <main className="flex flex-col flex-1 px-6 pt-4 pb-2">
         {/* Album art placeholder */}
         <img
-          src="https://ugc.production.linktr.ee/01b01392-3e4d-4c3b-b33f-b11f5d0b67ee_mmexport1688585314478.jpeg?io=true&size=avatar-v3_0"
+          src="https://upload.wikimedia.org/wikipedia/en/f/fe/Billie_Eilish_-_Birds_of_a_Feather_7%22_Vinyl_cover.png"
           alt="Album art"
           className="w-full aspect-square max-w-[280px] mx-auto rounded-xl object-cover shrink-0"
         />
@@ -175,11 +201,21 @@ export default function Strudel() {
             aria-label={playing ? 'Pause' : 'Play'}
           >
             {playing ? (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
               </svg>
             ) : (
-              <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M8 5v14l11-7z" />
               </svg>
             )}
@@ -214,12 +250,22 @@ export default function Strudel() {
           </div>
           <div className="flex items-center gap-4 text-white/70">
             <button type="button" aria-label="Share">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z" />
               </svg>
             </button>
             <button type="button" aria-label="Queue">
-              <svg width="20" height="20" viewBox="0 0 24 24" fill="currentColor">
+              <svg
+                width="20"
+                height="20"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
                 <path d="M4 6h2v12H4zm4 0h2v12H8zm4 0h2v12h-2zm4 0h2v12h-2z" />
               </svg>
             </button>
@@ -229,9 +275,12 @@ export default function Strudel() {
 
       {/* Footer */}
       <footer className="px-6 py-4 bg-[#181818] border-t border-white/5">
-        <h3 className="text-sm font-semibold text-white/90">About the artist</h3>
+        <h3 className="text-sm font-semibold text-white/90">
+          About the artist
+        </h3>
         <p className="text-xs text-white/60 mt-1 line-clamp-2">
-          Live code music with Strudel — a pattern language for musical sequences.
+          Live code music with Strudel — a pattern language for musical
+          sequences.
         </p>
       </footer>
     </div>

@@ -39,17 +39,23 @@ async function prebake(): Promise<void> {
   ]);
 }
 
+function isIOS(): boolean {
+  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
+}
+
 export async function initStrudel(): Promise<Repl> {
   if (initPromise) return initPromise;
 
+  const initOptions = isIOS() ? { disableWorklets: true } : {};
+
   initPromise = (async () => {
-    initAudioOnFirstClick();
     miniAllStrings();
 
     const r = webaudioRepl({ transpiler });
     repl = r;
     setTime(() => r.scheduler.now());
 
+    await initAudioOnFirstClick(initOptions);
     await prebake();
     return r;
   })();
