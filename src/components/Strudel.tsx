@@ -18,8 +18,8 @@ function formatTime(seconds: number): string {
 }
 
 export default function Strudel() {
+  const initRef = useRef(false);
   const [ready, setReady] = useState(false);
-  const [unlocking, setUnlocking] = useState(false);
   const [playing, setPlaying] = useState(false);
   const [elapsed, setElapsed] = useState(0);
   const [scrubbing, setScrubbing] = useState(false);
@@ -30,16 +30,11 @@ export default function Strudel() {
     scrubbingRef.current = scrubbing;
   }, [scrubbing]);
 
-  const handleUnlockAudio = async () => {
-    if (ready || unlocking) return;
-    setUnlocking(true);
-    try {
-      await initStrudel();
-      setReady(true);
-    } finally {
-      setUnlocking(false);
-    }
-  };
+  useEffect(() => {
+    if (initRef.current) return;
+    initRef.current = true;
+    initStrudel().then(() => setReady(true));
+  }, []);
 
   useEffect(() => {
     const tick = () => {
@@ -83,28 +78,7 @@ export default function Strudel() {
   const remainingSeconds = Math.max(0, DURATION_SECONDS - elapsed);
 
   return (
-    <div className="flex flex-col min-h-screen bg-[#121212] text-white relative">
-      {/* iOS audio unlock overlay - must tap to enable AudioContext */}
-      {!ready && (
-        <div
-          role="button"
-          tabIndex={0}
-          onPointerDown={handleUnlockAudio}
-          onKeyDown={(e) => e.key === 'Enter' && handleUnlockAudio()}
-          className="fixed inset-0 z-50 flex flex-col items-center justify-center bg-[#121212] px-6"
-          aria-label="Tap to enable audio"
-        >
-          <p className="text-lg text-white/90 text-center">
-            {unlocking ? 'Loading…' : 'Tap to enable audio'}
-          </p>
-          <p className="text-sm text-white/50 text-center mt-2 max-w-[260px]">
-            {unlocking
-              ? 'Preparing sounds…'
-              : 'Required for playback on mobile devices'}
-          </p>
-        </div>
-      )}
-
+    <div className="flex flex-col h-full min-h-0 overflow-hidden bg-[#121212] text-white">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-[#121212] shrink-0">
         <button
@@ -129,7 +103,7 @@ export default function Strudel() {
       </header>
 
       {/* Main content */}
-      <main className="flex flex-col flex-1 px-6 pt-4 pb-2">
+      <main className="flex flex-col flex-1 min-h-0 overflow-hidden px-6 pt-4 pb-2">
         {/* Album art placeholder */}
         <img
           src="https://upload.wikimedia.org/wikipedia/en/f/fe/Billie_Eilish_-_Birds_of_a_Feather_7%22_Vinyl_cover.png"
@@ -276,11 +250,17 @@ export default function Strudel() {
       {/* Footer */}
       <footer className="px-6 py-4 bg-[#181818] border-t border-white/5">
         <h3 className="text-sm font-semibold text-white/90">
-          About the artist
+          About this project
         </h3>
         <p className="text-xs text-white/60 mt-1 line-clamp-2">
-          Live code music with Strudel — a pattern language for musical
-          sequences.
+          Streaming app for{' '}
+          <a
+            className="text-white/80 font-semibold hover:text-white"
+            href="https://strudel.tidalcycles.org"
+          >
+            Strudel
+          </a>{' '}
+          - a pattern language for writing music. More coming soon.
         </p>
       </footer>
     </div>

@@ -114,3 +114,17 @@ declare module '*.strudel?raw' {
   const content: string;
   export default content;
 }
+
+interface AudioSession {
+  type:
+    | 'auto'
+    | 'playback'
+    | 'ambient'
+    | 'transient'
+    | 'transient-solo'
+    | 'play-and-record';
+}
+
+interface Navigator {
+  audioSession?: AudioSession;
+}

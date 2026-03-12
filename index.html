@@ -8,6 +8,25 @@
   </head>
   <body>
     <div id="root"></div>
+    <script>
+      // iOS Safari workaround: ensure AudioWorkletNode is on window before any module loads.
+      // WebKit can throw "Can't find variable: AudioWorkletNode" in bundled code due to
+      // scope quirks. Explicitly attaching to window helps. Requires iOS 14.5+.
+      (function () {
+        if (typeof window === 'undefined') return;
+        try {
+          var awn = (0, eval)('AudioWorkletNode');
+          if (awn && !window.AudioWorkletNode) window.AudioWorkletNode = awn;
+        } catch (e) {
+          var g = typeof globalThis !== 'undefined' ? globalThis : window;
+          if (g.AudioWorkletNode) {
+            window.AudioWorkletNode = g.AudioWorkletNode;
+          } else {
+            console.warn('Strudel requires iOS 14.5+ for audio. AudioWorkletNode not supported.');
+          }
+        }
+      })();
+    </script>
     <script type="module" src="/src/main.tsx"></script>
   </body>
 </html>

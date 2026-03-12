@@ -1,14 +1,18 @@
 import type { Repl } from '@strudel/core';
 import { evalScope, setTime } from '@strudel/core';
 import { webaudioRepl } from '@strudel/webaudio';
-import { initAudioOnFirstClick, registerSynthSounds, samples } from 'superdough';
+import {
+  initAudioOnFirstClick,
+  registerSynthSounds,
+  samples,
+} from 'superdough';
 import { registerSoundfonts } from '@strudel/soundfonts';
 import { transpiler } from '@strudel/transpiler';
 import { miniAllStrings } from '@strudel/mini';
 
 export const DURATION_SECONDS = 60;
 
-const CDN = "https://strudel.b-cdn.net";
+const CDN = 'https://strudel.b-cdn.net';
 
 let repl: Repl | null = null;
 let initPromise: Promise<Repl> | null = null;
@@ -16,6 +20,39 @@ let initPromise: Promise<Repl> | null = null;
 let wallClockStart = 0;
 let offsetSeconds = 0;
 let playing = false;
+
+let iosUnmuteDone = false;
+
+/**
+ * Unblock Web Audio on iOS when the mute switch is on.
+ * - iOS 17+: use navigator.audioSession.type = "playback" (proper fix)
+ * - Older iOS: fallback to silent HTML5 audio trick
+ * Must run on user gesture (e.g. when Play is tapped).
+ */
+function unmuteIosAudioOnce(): void {
+  if (iosUnmuteDone || typeof navigator === 'undefined') return;
+  const isIos =
+    /iPad|iPhone|iPod/.test(navigator.userAgent) ||
+    (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (!isIos) return;
+
+  iosUnmuteDone = true;
+
+  if ('audioSession' in navigator && navigator.audioSession?.type !== undefined) {
+    navigator.audioSession.type = 'playback';
+    return;
+  }
+
+  if (typeof document === 'undefined') return;
+  const silentWav =
+    'data:audio/wav;base64,UklGRiQAAABXQVZFZm10IBAAAAABAAEAQB8AAEAfAAABAAgAZGF0YQAAAAA=';
+  const audio = document.createElement('audio');
+  audio.setAttribute('x-webkit-airplay', 'deny');
+  audio.preload = 'auto';
+  audio.loop = true;
+  audio.src = silentWav;
+  void audio.play().catch(() => {});
+}
 
 async function prebake(): Promise<void> {
   await evalScope(
@@ -29,33 +66,31 @@ async function prebake(): Promise<void> {
   await Promise.all([
     registerSynthSounds(),
     registerSoundfonts(),
-    samples("github:tidalcycles/dirt-samples"),
+    samples('github:tidalcycles/dirt-samples'),
     samples(`${CDN}/piano.json`, `${CDN}/piano/`, { prebake: true }),
     samples(`${CDN}/vcsl.json`, `${CDN}/VCSL/`, { prebake: true }),
-    samples(`${CDN}/tidal-drum-machines.json`, `${CDN}/tidal-drum-machines/machines/`, {
-      prebake: true,
-      tag: "drum-machines",
-    }),
+    samples(
+      `${CDN}/tidal-drum-machines.json`,
+      `${CDN}/tidal-drum-machines/machines/`,
+      {
+        prebake: true,
+        tag: 'drum-machines',
+      }
+    ),
   ]);
-}
-
-function isIOS(): boolean {
-  return /iPad|iPhone|iPod/.test(navigator.userAgent) || (navigator.platform === "MacIntel" && navigator.maxTouchPoints > 1);
 }
 
 export async function initStrudel(): Promise<Repl> {
   if (initPromise) return initPromise;
 
-  const initOptions = isIOS() ? { disableWorklets: true } : {};
-
   initPromise = (async () => {
+    initAudioOnFirstClick();
     miniAllStrings();
 
     const r = webaudioRepl({ transpiler });
     repl = r;
     setTime(() => r.scheduler.now());
 
-    await initAudioOnFirstClick(initOptions);
     await prebake();
     return r;
   })();
@@ -110,6 +145,7 @@ function stripVisualWidgets(code: string): string {
 }
 
 export async function evaluate(code: string, autoplay = true): Promise<void> {
+  unmuteIosAudioOnce();
   if (!repl) {
     throw new Error(
       'evaluate: strudel not initialised — call initStrudel() first'

@@ -1,8 +1,29 @@
 @import 'tailwindcss';
 
+/* iOS Safari: use small viewport height so content fits when address bar is visible */
+html {
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+}
+
 body {
   margin: 0;
-  * {
-    box-sizing: border-box;
-  }
+  height: 100%;
+  height: 100dvh;
+  overflow: hidden;
+  position: fixed;
+  width: 100%;
+  -webkit-overflow-scrolling: touch;
+}
+
+#root {
+  height: 100%;
+  overflow: hidden;
+}
+
+* {
+  box-sizing: border-box;
 }
