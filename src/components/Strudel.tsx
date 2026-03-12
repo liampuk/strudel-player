@@ -1,5 +1,5 @@
-import { useEffect } from 'react';
-import { initStrudel } from '@strudel/web';
+import { useEffect, useRef, useState } from "react";
+import { initStrudel, evaluate, hush } from "./strudelEngine.ts";
 
 const song = `
 // @title dash on the train @by todepond
@@ -26,25 +26,29 @@ $: note("[C G], <D Fb B C A>*[0.5,2]")
 `;
 
 export default function Strudel() {
+  const initRef = useRef(false);
+  const [ready, setReady] = useState(false);
+
   useEffect(() => {
-    initStrudel();
+    if (initRef.current) return;
+    initRef.current = true;
+
+    initStrudel().then(() => setReady(true));
   }, []);
 
   return (
     <div className="flex gap-2 p-4">
       <button
-        className="bg-blue-500 text-white p-2 rounded-md cursor-pointer"
-        onClick={() => {
-          evaluate(song);
-        }}
+        className="bg-blue-500 text-white p-2 rounded-md cursor-pointer disabled:opacity-50"
+        disabled={!ready}
+        onClick={() => evaluate(song)}
       >
         Play
       </button>
       <button
-        className="bg-red-500 text-white p-2 rounded-md cursor-pointer"
-        onClick={() => {
-          hush();
-        }}
+        className="bg-red-500 text-white p-2 rounded-md cursor-pointer disabled:opacity-50"
+        disabled={!ready}
+        onClick={() => hush()}
       >
         Stop
       </button>
