@@ -78,7 +78,7 @@ export default function Strudel() {
   const remainingSeconds = Math.max(0, DURATION_SECONDS - elapsed);
 
   return (
-    <div className="flex flex-col h-full min-h-0 overflow-hidden bg-[#121212] text-white">
+    <div className="flex flex-col h-full min-h-0 overflow-hidden bg-[#121212] text-white md:max-h-[800px]">
       {/* Header */}
       <header className="flex items-center justify-between px-4 py-3 bg-[#121212] shrink-0">
         <button
@@ -171,7 +171,7 @@ export default function Strudel() {
             type="button"
             onClick={handlePlayPause}
             disabled={!ready}
-            className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-[#121212] hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100"
+            className="w-14 h-14 rounded-full bg-white flex items-center justify-center text-[#121212] hover:scale-105 transition-transform disabled:opacity-50 disabled:hover:scale-100 cursor-pointer"
             aria-label={playing ? 'Pause' : 'Play'}
           >
             {playing ? (
