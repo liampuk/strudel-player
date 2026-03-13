@@ -151,10 +151,13 @@ export async function evaluate(code: string, autoplay = true): Promise<void> {
       'evaluate: strudel not initialised — call initStrudel() first'
     );
   }
+  // Reset position only when at end (song finished); keep it when resuming from pause
+  if (offsetSeconds >= DURATION_SECONDS) {
+    offsetSeconds = 0;
+  }
   wallClockStart = performance.now() / 1000;
   playing = true;
   await repl.evaluate(stripVisualWidgets(code), autoplay);
-
   if (offsetSeconds > 0) {
     seekTo(offsetSeconds);
   }
