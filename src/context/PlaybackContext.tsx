@@ -17,6 +17,7 @@ import {
   checkDurationLimit,
   DURATION_SECONDS,
 } from '../components/strudelEngine';
+import { getTrackIdFromUrl } from '../utils/urlUtils';
 import type { Track } from '../types/track';
 
 interface PlaybackContextValue {
@@ -28,12 +29,14 @@ interface PlaybackContextValue {
   toggleRepeat: () => void;
   shuffle: boolean;
   toggleShuffle: () => void;
-  playTrack: (track: Track, options?: { fromPrevious?: boolean }) => Promise<void>;
+  playTrack: (track: Track, options?: { fromPrevious?: boolean; expandPlayer?: boolean }) => Promise<void>;
   pushToHistory: (track: Track) => void;
   popFromHistory: () => Track | null;
   pause: () => void;
   seekTo: (seconds: number) => void;
   DURATION_SECONDS: number;
+  playerExpanded: boolean;
+  setPlayerExpanded: (expanded: boolean) => void;
 }
 
 const PlaybackContext = createContext<PlaybackContextValue | null>(null);
@@ -46,27 +49,29 @@ export function PlaybackProvider({
   tracks: Track[];
 }) {
   const initRef = useRef(false);
+  const autoplayRef = useRef(false);
   const [ready, setReady] = useState(false);
   const [playing, setPlaying] = useState(false);
-  const [currentTrack, setCurrentTrack] = useState<Track | null>(
-    tracks.find((t) => t.id === 'dash-on-the-train') ?? tracks[0] ?? null
-  );
+  const [currentTrack, setCurrentTrack] = useState<Track | null>(null);
   const [elapsed, setElapsed] = useState(0);
   const [repeat, setRepeat] = useState(true);
   const [shuffle, setShuffle] = useState(false);
+  const [playerExpanded, setPlayerExpanded] = useState(false);
   const historyRef = useRef<Track[]>([]);
   const rafRef = useRef<number>(0);
   const repeatRef = useRef(repeat);
   const currentTrackRef = useRef(currentTrack);
   const playTrackRef = useRef<
-    (track: Track, options?: { fromPrevious?: boolean }) => Promise<void>
+    (track: Track, options?: { fromPrevious?: boolean; expandPlayer?: boolean }) => Promise<void>
   >(() => Promise.resolve());
   const pauseRef = useRef(() => {});
   const playingRef = useRef(playing);
 
-  repeatRef.current = repeat;
-  currentTrackRef.current = currentTrack;
-  playingRef.current = playing;
+  useEffect(() => {
+    repeatRef.current = repeat;
+    currentTrackRef.current = currentTrack;
+    playingRef.current = playing;
+  }, [repeat, currentTrack, playing]);
 
   const toggleRepeat = useCallback(() => {
     setRepeat((r) => !r);
@@ -95,6 +100,19 @@ export function PlaybackProvider({
   }, []);
 
   useEffect(() => {
+    if (!ready || tracks.length === 0 || autoplayRef.current) return;
+    const trackId = getTrackIdFromUrl();
+    if (trackId) {
+      const track = tracks.find((t) => t.id === trackId);
+      if (track) {
+        autoplayRef.current = true;
+        setCurrentTrack(track);
+        setPlayerExpanded(true);
+      }
+    }
+  }, [ready, tracks]);
+
+  useEffect(() => {
     const tick = () => {
       if (checkDurationLimit()) {
         setPlaying(false);
@@ -114,7 +132,7 @@ export function PlaybackProvider({
   }, []);
 
   const playTrack = useCallback(
-    async (track: Track, options?: { fromPrevious?: boolean }) => {
+    async (track: Track, options?: { fromPrevious?: boolean; expandPlayer?: boolean }) => {
       const isNewTrack = track !== currentTrack;
       if (
         isNewTrack &&
@@ -125,6 +143,9 @@ export function PlaybackProvider({
         pushToHistory(currentTrack);
       }
       setCurrentTrack(track);
+      if (options?.expandPlayer) {
+        setPlayerExpanded(true);
+      }
       if (isNewTrack) {
         seekTo(0); // Reset position when switching tracks
       }
@@ -135,15 +156,19 @@ export function PlaybackProvider({
     [currentTrack, shuffle, pushToHistory]
   );
 
-  playTrackRef.current = playTrack;
-
   const pause = useCallback(() => {
     seekTo(getElapsedSeconds()); // Save position before stopping
     hush();
     setPlaying(false);
   }, []);
 
-  pauseRef.current = pause;
+  useEffect(() => {
+    playTrackRef.current = playTrack;
+  }, [playTrack]);
+
+  useEffect(() => {
+    pauseRef.current = pause;
+  }, [pause]);
 
   useEffect(() => {
     const handleKeyDown = (e: KeyboardEvent) => {
@@ -187,6 +212,8 @@ export function PlaybackProvider({
     pause,
     seekTo: handleSeekTo,
     DURATION_SECONDS,
+    playerExpanded,
+    setPlayerExpanded,
   };
 
   return (
@@ -194,6 +221,7 @@ export function PlaybackProvider({
   );
 }
 
+// eslint-disable-next-line react-refresh/only-export-components -- usePlayback is a hook that must stay with the context
 export function usePlayback() {
   const ctx = useContext(PlaybackContext);
   if (!ctx) throw new Error('usePlayback must be used within PlaybackProvider');

@@ -1,9 +1,13 @@
-import { useState, useMemo } from 'react';
+import { useState, useMemo, useRef, useEffect } from 'react';
 import { usePlayback } from '../context/PlaybackContext';
+import { getShareUrlForCode, getShareUrlForTrackId } from '../utils/urlUtils';
 import type { Track } from '../types/track';
 
 interface PlaylistProps {
   tracks: Track[];
+  onOpenInfo: () => void;
+  onOpenAddSongs: () => void;
+  onDeleteTrack: (track: Track) => void;
 }
 
 function TrackRow({
@@ -11,17 +15,44 @@ function TrackRow({
   isActive,
   isPlaying,
   onSelect,
+  menuOpen,
+  onOpenMenu,
+  onShare,
+  onDelete,
 }: {
   track: Track;
   isActive: boolean;
   isPlaying: boolean;
   onSelect: () => void;
+  menuOpen: boolean;
+  onOpenMenu: (trackId: string | null) => void;
+  onShare: () => void;
+  onDelete: () => void;
 }) {
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        onOpenMenu(null);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen, onOpenMenu]);
   return (
-    <button
-      type="button"
+    <div
+      role="button"
+      tabIndex={0}
       onClick={onSelect}
-      className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-white/5 transition-colors"
+      onKeyDown={(e) => {
+        if (e.key === 'Enter' || e.key === ' ') {
+          e.preventDefault();
+          onSelect();
+        }
+      }}
+      className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-white/5 transition-colors cursor-pointer"
     >
       <img
         src={track.albumArt}
@@ -66,25 +97,104 @@ function TrackRow({
             {track.title}
           </p>
         </div>
-        <p className="truncate text-sm text-white/60">{track.artist}</p>
+        <div className="flex items-center gap-1.5 min-w-0">
+          {track.userAdded && (
+            <span
+              className="shrink-0 w-3 h-3 rounded-full bg-[#1DB954] flex items-center justify-center text-[#121212]"
+              aria-hidden
+            >
+              <svg width="8" height="8" viewBox="0 0 24 24" fill="currentColor">
+                <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+              </svg>
+            </span>
+          )}
+          <p className="truncate text-sm text-white/60">{track.artist}</p>
+        </div>
       </div>
-      <button
-        type="button"
-        className="p-2 text-white/60 hover:text-white shrink-0"
-        aria-label="More options"
-        onClick={(e) => e.stopPropagation()}
-      >
-        <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-          <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-        </svg>
-      </button>
-    </button>
+      <div className="relative shrink-0" ref={menuRef}>
+        <button
+          type="button"
+          className="p-2 text-white/60 hover:text-white shrink-0"
+          aria-label="More options"
+          aria-expanded={menuOpen}
+          aria-haspopup="true"
+          onClick={(e) => {
+            e.stopPropagation();
+            onOpenMenu(menuOpen ? null : track.id);
+          }}
+        >
+          <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
+            <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+          </svg>
+        </button>
+        {menuOpen && (
+          <div
+            className="absolute right-0 top-full mt-1 py-1 min-w-[140px] rounded-lg bg-[#282828] shadow-lg border border-white/10 z-50"
+            role="menu"
+          >
+            <button
+              type="button"
+              role="menuitem"
+              className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-3"
+              onClick={(e) => {
+                e.stopPropagation();
+                onShare();
+                onOpenMenu(null);
+              }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z" />
+              </svg>
+              Share
+            </button>
+            <button
+              type="button"
+              role="menuitem"
+              disabled={!track.userAdded}
+              className={`w-full px-4 py-2 text-left text-sm flex items-center gap-3 ${
+                track.userAdded
+                  ? 'text-white hover:bg-white/10'
+                  : 'text-white/40 cursor-not-allowed'
+              }`}
+              onClick={(e) => {
+                e.stopPropagation();
+                if (track.userAdded) {
+                  onDelete();
+                  onOpenMenu(null);
+                }
+              }}
+            >
+              <svg
+                width="18"
+                height="18"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M6 19c0 1.1.9 2 2 2h8c1.1 0 2-.9 2-2V7H6v12zM19 4h-3.5l-1-1h-5l-1 1H5v2h14V4z" />
+              </svg>
+              Delete
+            </button>
+          </div>
+        )}
+      </div>
+    </div>
   );
 }
 
-export default function Playlist({ tracks }: PlaylistProps) {
+export default function Playlist({
+  tracks,
+  onOpenInfo,
+  onOpenAddSongs,
+  onDeleteTrack,
+}: PlaylistProps) {
   const { currentTrack, playing, playTrack, pause, ready } = usePlayback();
   const [searchQuery, setSearchQuery] = useState('');
+  const [openMenuTrackId, setOpenMenuTrackId] = useState<string | null>(null);
 
   const filteredTracks = useMemo(() => {
     const q = searchQuery.trim().toLowerCase();
@@ -101,7 +211,7 @@ export default function Playlist({ tracks }: PlaylistProps) {
       pause();
     } else {
       const track = currentTrack ?? tracks[0];
-      playTrack(track);
+      playTrack(track, { expandPlayer: true });
     }
   };
 
@@ -112,8 +222,9 @@ export default function Playlist({ tracks }: PlaylistProps) {
         <div className="flex items-center justify-between gap-2">
           <button
             type="button"
-            className="p-2 -ml-2 text-white/90 hover:text-white"
+            className="p-2 -ml-2 text-white/90 hover:text-white cursor-pointer"
             aria-label="Info"
+            onClick={onOpenInfo}
           >
             <svg
               width="24"
@@ -147,8 +258,8 @@ export default function Playlist({ tracks }: PlaylistProps) {
         <div className="flex-1 min-w-0">
           <h1 className="text-2xl font-bold">Strudel Songs</h1>
           <p className="text-sm text-white/60 mt-0.5">
-            Browse the current list of tracks. Have a song you'd like to add?
-            Submit it{' '}
+            Browse the current list of tracks. Have a song you'd like to add for
+            everyone? Submit it{' '}
             <a
               className="text-white/80 font-semibold hover:text-white"
               target="_blank"
@@ -181,13 +292,49 @@ export default function Playlist({ tracks }: PlaylistProps) {
 
       {/* Song list */}
       <div className="flex-1 min-h-0 overflow-y-auto">
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={onOpenAddSongs}
+          onKeyDown={(e) => {
+            if (e.key === 'Enter' || e.key === ' ') {
+              e.preventDefault();
+              onOpenAddSongs();
+            }
+          }}
+          className="flex w-full items-center gap-3 px-4 py-2 text-left hover:bg-white/5 transition-colors cursor-pointer"
+        >
+          <div className="w-12 h-12 rounded shrink-0 bg-white/10 flex items-center justify-center">
+            <svg
+              width="24"
+              height="24"
+              viewBox="0 0 24 24"
+              fill="currentColor"
+              className="text-white/70"
+            >
+              <path d="M19 13h-6v6h-2v-6H5v-2h6V5h2v6h6v2z" />
+            </svg>
+          </div>
+          <div className="flex-1 min-w-0">
+            <p className="truncate font-normal text-white/90">Add songs</p>
+          </div>
+        </div>
         {filteredTracks.map((track) => (
           <TrackRow
             key={track.id}
             track={track}
             isActive={currentTrack?.id === track.id}
             isPlaying={playing && currentTrack?.id === track.id}
-            onSelect={() => playTrack(track)}
+            onSelect={() => playTrack(track, { expandPlayer: true })}
+            menuOpen={openMenuTrackId === track.id}
+            onOpenMenu={setOpenMenuTrackId}
+            onShare={() => {
+              const url = track.userAdded
+                ? getShareUrlForCode(track.code)
+                : getShareUrlForTrackId(track.id);
+              void navigator.clipboard.writeText(url);
+            }}
+            onDelete={() => onDeleteTrack(track)}
           />
         ))}
       </div>

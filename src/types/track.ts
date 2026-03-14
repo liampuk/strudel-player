@@ -5,4 +5,5 @@ export interface Track {
   artistUrl: string;
   albumArt: string;
   code: string;
+  userAdded?: boolean;
 }

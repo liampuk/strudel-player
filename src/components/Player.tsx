@@ -1,5 +1,6 @@
-import { useRef, useState } from 'react';
+import { useEffect, useRef, useState } from 'react';
 import { usePlayback } from '../context/PlaybackContext';
+import { getShareUrlForCode, getShareUrlForTrackId } from '../utils/urlUtils';
 import type { Track } from '../types/track';
 
 function formatTime(seconds: number): string {
@@ -30,9 +31,24 @@ export default function Player({ tracks }: PlayerProps) {
     pause,
     seekTo,
     DURATION_SECONDS,
+    playerExpanded,
+    setPlayerExpanded,
   } = usePlayback();
-  const [collapsed, setCollapsed] = useState(false);
+  const collapsed = !playerExpanded;
   const [dragY, setDragY] = useState(0);
+  const [menuOpen, setMenuOpen] = useState(false);
+  const menuRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    if (!menuOpen) return;
+    const handleClickOutside = (e: MouseEvent) => {
+      if (menuRef.current && !menuRef.current.contains(e.target as Node)) {
+        setMenuOpen(false);
+      }
+    };
+    document.addEventListener('mousedown', handleClickOutside);
+    return () => document.removeEventListener('mousedown', handleClickOutside);
+  }, [menuOpen]);
   const containerRef = useRef<HTMLDivElement>(null);
   const fullPlayerRef = useRef<HTMLDivElement>(null);
   const dragStartYRef = useRef(0);
@@ -125,7 +141,7 @@ export default function Player({ tracks }: PlayerProps) {
     const threshold = containerHeight * DRAG_THRESHOLD_RATIO;
     const currentDragY = dragYRef.current;
     if (currentDragY > threshold) {
-      setCollapsed(true);
+      setPlayerExpanded(false);
     }
     setDragY(0);
     dragYRef.current = 0;
@@ -158,7 +174,9 @@ export default function Player({ tracks }: PlayerProps) {
       {/* Full player - slides down when collapsed, draggable */}
       <div
         ref={fullPlayerRef}
-        className="pointer-events-auto flex flex-col h-full min-h-0 overflow-hidden bg-[#121212] text-white shadow-[0_-8px_16px_rgba(0,0,0,0.3)]"
+        className={`pointer-events-auto flex flex-col h-full min-h-0 overflow-hidden bg-[#121212] text-white ${
+          collapsed ? '' : 'shadow-[0_-8px_16px_rgba(0,0,0,0.3)]'
+        }`}
         style={{
           transform: fullPlayerTransform,
           transition: isDragging ? 'none' : 'transform 300ms ease-out',
@@ -174,26 +192,67 @@ export default function Player({ tracks }: PlayerProps) {
             type="button"
             className="p-2 -ml-2 text-white/90 hover:text-white -rotate-90 cursor-pointer"
             aria-label="Back"
-            onClick={() => setCollapsed(true)}
+            onClick={() => setPlayerExpanded(false)}
           >
             <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
               <path d="M15.41 7.41L14 6l-6 6 6 6 1.41-1.41L10.83 12z" />
             </svg>
           </button>
           <h1 className="text-base font-semibold select-none">Now Playing</h1>
-          <button
-            type="button"
-            className="p-2 -mr-2 text-white/90 hover:text-white"
-            aria-label="More options"
-          >
-            <svg width="24" height="24" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
-            </svg>
-          </button>
+          <div className="relative -mr-2" ref={menuRef}>
+            <button
+              type="button"
+              className="p-2 text-white/90 hover:text-white disabled:opacity-50 disabled:cursor-not-allowed"
+              aria-label="More options"
+              aria-expanded={menuOpen}
+              aria-haspopup="true"
+              disabled={!currentTrack}
+              onClick={() => setMenuOpen((prev) => !prev)}
+            >
+              <svg
+                width="24"
+                height="24"
+                viewBox="0 0 24 24"
+                fill="currentColor"
+              >
+                <path d="M12 8c1.1 0 2-.9 2-2s-.9-2-2-2-2 .9-2 2 .9 2 2 2zm0 2c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2zm0 6c-1.1 0-2 .9-2 2s.9 2 2 2 2-.9 2-2-.9-2-2-2z" />
+              </svg>
+            </button>
+            {menuOpen && currentTrack && (
+              <div
+                className="absolute right-0 top-full mt-1 py-1 min-w-[140px] rounded-lg bg-[#282828] shadow-lg border border-white/10 z-50"
+                role="menu"
+              >
+                <button
+                  type="button"
+                  role="menuitem"
+                  className="w-full px-4 py-2 text-left text-sm text-white hover:bg-white/10 flex items-center gap-3"
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    const url = currentTrack.userAdded
+                      ? getShareUrlForCode(currentTrack.code)
+                      : getShareUrlForTrackId(currentTrack.id);
+                    void navigator.clipboard.writeText(url);
+                    setMenuOpen(false);
+                  }}
+                >
+                  <svg
+                    width="18"
+                    height="18"
+                    viewBox="0 0 24 24"
+                    fill="currentColor"
+                  >
+                    <path d="M18 16.08c-.76 0-1.44.3-1.96.77L8.91 12.7c.05-.23.09-.46.09-.7s-.04-.47-.09-.7l7.05-4.11c.54.5 1.25.81 2.04.81 1.66 0 3-1.34 3-3s-1.34-3-3-3-3 1.34-3 3c0 .24.04.47.09.7L8.04 9.81C7.5 9.31 6.79 9 6 9c-1.66 0-3 1.34-3 3s1.34 3 3 3c.79 0 1.5-.31 2.04-.81l7.12 4.16c-.05.21-.08.43-.08.65 0 1.61 1.31 2.92 2.92 2.92s2.92-1.31 2.92-2.92c0-1.61-1.31-2.92-2.92-2.92z" />
+                  </svg>
+                  Share
+                </button>
+              </div>
+            )}
+          </div>
         </header>
 
         {/* Main content */}
-        <main className="flex flex-col flex-1 min-h-0 overflow-hidden px-6 pt-4 pb-2">
+        <section className="flex flex-col flex-1 min-h-0 overflow-hidden px-6 pt-4 pb-2">
           {/* Album art placeholder */}
           <img
             src={albumArtUrl}
@@ -218,9 +277,17 @@ export default function Player({ tracks }: PlayerProps) {
                 </a>
               </p>
             </div>
-            <div className="shrink-0 w-10 h-10 rounded-full bg-[#1DB954] flex items-center justify-center hover:scale-105 transition-transform cursor-pointer">
+            <div
+              className={`shrink-0 w-10 h-10 rounded-full flex items-center justify-center hover:scale-105 transition-transform cursor-pointer ${
+                currentTrack?.userAdded ? 'bg-white/30' : 'bg-[#1DB954]'
+              }`}
+            >
               <svg width="20" height="20" viewBox="0 0 24 24" fill="white">
-                <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                {currentTrack?.userAdded ? (
+                  <path d="M12 12c2.21 0 4-1.79 4-4s-1.79-4-4-4-4 1.79-4 4 1.79 4 4 4zm0 2c-2.67 0-8 1.34-8 4v2h16v-2c0-2.66-5.33-4-8-4z" />
+                ) : (
+                  <path d="M9 16.17L4.83 12l-1.42 1.41L9 19 21 7l-1.41-1.41z" />
+                )}
               </svg>
             </div>
           </div>
@@ -367,7 +434,20 @@ export default function Player({ tracks }: PlayerProps) {
               <span>View code</span>
             </div>
             <div className="flex items-center gap-4 text-white/70">
-              <button type="button" aria-label="Share">
+              <button
+                type="button"
+                aria-label="Share"
+                disabled={!currentTrack}
+                className="disabled:opacity-50 disabled:cursor-not-allowed hover:text-white active:text-green-500 transition-colors cursor-pointer"
+                onClick={() => {
+                  if (currentTrack) {
+                    const url = currentTrack.userAdded
+                      ? getShareUrlForCode(currentTrack.code)
+                      : getShareUrlForTrackId(currentTrack.id);
+                    void navigator.clipboard.writeText(url);
+                  }
+                }}
+              >
                 <svg
                   width="20"
                   height="20"
@@ -379,7 +459,7 @@ export default function Player({ tracks }: PlayerProps) {
               </button>
             </div>
           </div>
-        </main>
+        </section>
 
         {/* Footer */}
         <footer className="px-6 py-4 bg-[#181818] border-t border-white/5">
@@ -406,83 +486,93 @@ export default function Player({ tracks }: PlayerProps) {
         </footer>
       </div>
 
-      {/* Now playing bar - slides up when collapsed or dragging, click to expand */}
-      <div
-        role="button"
-        tabIndex={0}
-        onClick={() => setCollapsed(false)}
-        onKeyDown={(e) => e.key === 'Enter' && setCollapsed(false)}
-        className="pointer-events-auto absolute bottom-0 left-0 right-0 z-10 flex items-center gap-3 px-4 py-3 bg-[#181a2b] rounded-t-lg cursor-default text-left"
-        style={{
-          transform: collapsed
-            ? 'translateY(0)'
-            : isDragging
-            ? `translateY(max(0px, calc(100% - ${dragY}px)))`
-            : 'translateY(100%)',
-          transition: isDragging ? 'none' : 'transform 300ms ease-out',
-        }}
-        aria-label="Expand player"
-      >
-        <img
-          src={albumArtUrl}
-          alt=""
-          className="w-12 h-12 rounded-lg object-cover shrink-0"
-        />
-        <div className="flex-1 min-w-0">
-          <p className="text-sm font-semibold text-white truncate">
-            {currentTrack ? (
-              <>
-                {currentTrack.title}{' '}
-                <span className="text-white/50 font-normal">•</span>{' '}
-                <span className="text-white/70 font-normal">
-                  {currentTrack.artist}
-                </span>
-              </>
-            ) : (
-              '—'
-            )}
-          </p>
-          <div className="flex items-center gap-1.5 mt-0.5 text-[#1DB954]">
-            <svg width="14" height="14" viewBox="0 0 24 24" fill="currentColor">
-              <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
-            </svg>
-            <span className="text-xs font-medium truncate">
-              Currently playing
-            </span>
+      {/* Now playing bar - slides up when collapsed or dragging, click to expand. Hidden when no track. */}
+      {currentTrack && (
+        <div
+          role="button"
+          tabIndex={0}
+          onClick={() => setPlayerExpanded(true)}
+          onKeyDown={(e) => e.key === 'Enter' && setPlayerExpanded(true)}
+          className="pointer-events-auto absolute bottom-0 left-0 right-0 z-10 flex items-center gap-3 px-4 py-3 bg-[#181a2b] rounded-t-lg cursor-default text-left"
+          style={{
+            transform: collapsed
+              ? 'translateY(0)'
+              : isDragging
+              ? `translateY(max(0px, calc(100% - ${dragY}px)))`
+              : 'translateY(100%)',
+            transition: isDragging ? 'none' : 'transform 300ms ease-out',
+          }}
+          aria-label="Expand player"
+        >
+          <img
+            src={albumArtUrl}
+            alt=""
+            className="w-12 h-12 rounded-lg object-cover shrink-0"
+          />
+          <div className="flex-1 min-w-0">
+            <p className="text-sm font-semibold text-white truncate">
+              {currentTrack ? (
+                <>
+                  {currentTrack.title}{' '}
+                  <span className="text-white/50 font-normal">•</span>{' '}
+                  <span className="text-white/70 font-normal">
+                    {currentTrack.artist}
+                  </span>
+                </>
+              ) : (
+                '—'
+              )}
+            </p>
+            <div className="flex items-center gap-1.5 mt-0.5 text-[#1DB954]">
+              {playing && (
+                <svg
+                  width="14"
+                  height="14"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M3 9v6h4l5 5V4L7 9H3zm13.5 3c0-1.77-1.02-3.29-2.5-4.03v8.05c1.48-.73 2.5-2.25 2.5-4.02zM14 3.23v2.06c2.89.86 5 3.54 5 6.71s-2.11 5.85-5 6.71v2.06c4.01-.91 7-4.49 7-8.77s-2.99-7.86-7-8.77z" />
+                </svg>
+              )}
+
+              <span className="text-xs font-medium truncate">
+                Currently playing
+              </span>
+            </div>
+          </div>
+          <div className="flex items-center gap-4 shrink-0">
+            <button
+              type="button"
+              className="p-1 text-white hover:text-white/90 cursor-pointer"
+              onClick={(e) => {
+                e.stopPropagation();
+                handlePlayPause();
+              }}
+              aria-label={playing ? 'Pause' : 'Play'}
+            >
+              {playing ? (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
+                </svg>
+              ) : (
+                <svg
+                  width="24"
+                  height="24"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                >
+                  <path d="M8 5v14l11-7z" />
+                </svg>
+              )}
+            </button>
           </div>
         </div>
-        <div className="flex items-center gap-4 shrink-0">
-          <button
-            type="button"
-            className="p-1 text-white hover:text-white/90 cursor-pointer"
-            onClick={(e) => {
-              e.stopPropagation();
-              handlePlayPause();
-            }}
-            aria-label={playing ? 'Pause' : 'Play'}
-          >
-            {playing ? (
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M6 19h4V5H6v14zm8-14v14h4V5h-4z" />
-              </svg>
-            ) : (
-              <svg
-                width="24"
-                height="24"
-                viewBox="0 0 24 24"
-                fill="currentColor"
-              >
-                <path d="M8 5v14l11-7z" />
-              </svg>
-            )}
-          </button>
-        </div>
-      </div>
+      )}
     </div>
   );
 }
