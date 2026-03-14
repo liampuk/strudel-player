@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react';
+import { useState } from 'react';
 import { PlaybackProvider } from './context/PlaybackContext';
 import Player from './components/Player';
 import Playlist from './components/Playlist';
@@ -13,14 +13,14 @@ function App() {
   const hasEncodedCodeOnLoad = !!getEncodedStrudelFromUrl();
   const [showAddSongsModal, setShowAddSongsModal] =
     useState(hasEncodedCodeOnLoad);
-  const openedByUrlLoadRef = useRef(hasEncodedCodeOnLoad);
+  const [openedByUrlLoad, setOpenedByUrlLoad] = useState(hasEncodedCodeOnLoad);
   const [userTracks, setUserTracks] = useState(getUserTracks);
   const tracks = [...defaultTracks, ...userTracks];
 
   return (
     <PlaybackProvider tracks={tracks}>
       <div className="h-full min-h-0 bg-[#090909] flex justify-center items-center overflow-hidden">
-        <div className="relative w-full max-w-[430px] h-full min-h-0 md:max-h-[832px] md:p-[8px] md:border md:border-white/80 md:rounded-[36px] md:bg-black">
+        <div className="relative w-full max-w-[400px] h-full min-h-0 md:max-h-[min(824px,88vh)] md:p-[8px] md:border md:border-white/80 md:rounded-[36px] md:bg-black">
           {/* Power button - right side */}
           <div
             className="absolute -right-[4px] top-[25%] hidden h-16 w-[3px] -translate-y-1/2 rounded-r bg-white/80 md:block"
@@ -70,11 +70,11 @@ function App() {
               isOpen={showAddSongsModal}
               onClose={() => {
                 setShowAddSongsModal(false);
-                openedByUrlLoadRef.current = false;
+                setOpenedByUrlLoad(false);
               }}
               onAddTrack={(track) => setUserTracks((prev) => [...prev, track])}
               initialCodeFromUrl={
-                openedByUrlLoadRef.current ? getEncodedStrudelFromUrl() : null
+                openedByUrlLoad ? getEncodedStrudelFromUrl() : null
               }
             />
           </main>

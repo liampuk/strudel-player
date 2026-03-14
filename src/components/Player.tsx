@@ -263,7 +263,7 @@ export default function Player({ tracks }: PlayerProps) {
           <img
             src={albumArtUrl}
             alt="Album art"
-            className="w-full aspect-square max-w-[280px] mx-auto rounded-lg object-cover shrink-0 pointer-events-none select-none"
+            className="w-full aspect-square max-w-[280px] mx-auto rounded-lg object-cover pointer-events-none select-none md:w-[min(280px,28vh)] md:h-[min(280px,28vh)] md:aspect-auto"
           />
 
           {/* Song info */}
