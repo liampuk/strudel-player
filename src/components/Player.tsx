@@ -1,7 +1,12 @@
 import { useEffect, useRef, useState } from 'react';
 import { usePlayback } from '../context/PlaybackContext';
-import { getShareUrlForCode, getShareUrlForTrackId } from '../utils/urlUtils';
+import {
+  getShareUrlForCode,
+  getShareUrlForTrackId,
+  getStrudelCcUrlForCode,
+} from '../utils/urlUtils';
 import type { Track } from '../types/track';
+import Modal from './Modal';
 
 function formatTime(seconds: number): string {
   const m = Math.floor(seconds / 60);
@@ -37,6 +42,7 @@ export default function Player({ tracks }: PlayerProps) {
   const collapsed = !playerExpanded;
   const [dragY, setDragY] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [codeModalOpen, setCodeModalOpen] = useState(false);
   const menuRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -422,7 +428,13 @@ export default function Player({ tracks }: PlayerProps) {
 
           {/* Device & sharing */}
           <div className="flex items-center justify-between mt-8 text-sm">
-            <div className="flex items-center gap-2 text-[#1DB954]">
+            <button
+              type="button"
+              disabled={!currentTrack}
+              onClick={() => setCodeModalOpen(true)}
+              className="flex items-center gap-2 text-[#1DB954] hover:text-[#1ed760] disabled:opacity-50 disabled:cursor-not-allowed disabled:hover:text-[#1DB954] cursor-pointer"
+              aria-label="View code"
+            >
               <svg
                 width="16"
                 height="16"
@@ -432,7 +444,7 @@ export default function Player({ tracks }: PlayerProps) {
                 <path d="M21 3H3c-1.1 0-2 .9-2 2v12c0 1.1.9 2 2 2h5v2h8v-2h5c1.1 0 2-.9 2-2V5c0-1.1-.9-2-2-2zm0 14H3V5h18v12z" />
               </svg>
               <span>View code</span>
-            </div>
+            </button>
             <div className="flex items-center gap-4 text-white/70">
               <button
                 type="button"
@@ -484,6 +496,41 @@ export default function Player({ tracks }: PlayerProps) {
             .
           </p>
         </footer>
+
+        <Modal
+          key={codeModalOpen ? 'open' : 'closed'}
+          isOpen={codeModalOpen}
+          onClose={() => setCodeModalOpen(false)}
+          title={currentTrack ? `${currentTrack.title} – Code` : 'View code'}
+          ariaLabel="View Strudel code"
+        >
+          {currentTrack ? (
+            <>
+              <pre className="p-4 rounded-lg bg-[#0d0d0d] text-sm text-white/90 overflow-x-auto font-mono whitespace-pre-wrap wrap-break-word">
+                <code>{currentTrack.code}</code>
+              </pre>
+              <a
+                href={getStrudelCcUrlForCode(currentTrack.code)}
+                target="_blank"
+                rel="noopener noreferrer"
+                className="mt-4 inline-flex items-center justify-center gap-2 w-full py-3 rounded-lg bg-[#1DB954] text-white font-medium hover:bg-[#1ed760] transition-colors"
+              >
+                View on strudel.cc
+                <svg
+                  width="16"
+                  height="16"
+                  viewBox="0 0 24 24"
+                  fill="currentColor"
+                  aria-hidden
+                >
+                  <path d="M19 19H5V5h7V3H5c-1.11 0-2 .9-2 2v14c0 1.1.89 2 2 2h14c1.1 0 2-.9 2-2v-7h-2v7zM14 3v2h3.59l-9.83 9.83 1.41 1.41L19 6.41V10h2V3h-7z" />
+                </svg>
+              </a>
+            </>
+          ) : (
+            <p className="text-white/60">No track selected.</p>
+          )}
+        </Modal>
       </div>
 
       {/* Now playing bar - slides up when collapsed or dragging, click to expand. Hidden when no track. */}

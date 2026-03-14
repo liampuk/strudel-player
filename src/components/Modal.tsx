@@ -43,13 +43,13 @@ export default function Modal({
         onClick={handleClose}
       />
       <div
-        className={`relative bg-[#181818] rounded-t-2xl px-6 pt-4 pb-[max(1.5rem,env(safe-area-inset-bottom))] max-h-[90%] overflow-y-auto shadow-[0_-4px_24px_rgba(0,0,0,0.4)] ${
+        className={`relative flex min-h-0 flex-col max-h-[90%] overflow-hidden bg-[#181818] rounded-t-2xl shadow-[0_-4px_24px_rgba(0,0,0,0.4)] ${
           isClosing ? 'animate-slide-down' : 'animate-slide-up'
         }`}
         onClick={(e) => e.stopPropagation()}
         onAnimationEnd={handleAnimationEnd}
       >
-        <div className="flex items-center justify-between mb-4">
+        <div className="flex shrink-0 items-center justify-between px-6 pt-4 pb-4">
           <h2 className="text-lg font-semibold text-white">{title}</h2>
           <button
             type="button"
@@ -62,7 +62,9 @@ export default function Modal({
             </svg>
           </button>
         </div>
-        {children}
+        <div className="min-h-0 flex-1 overflow-y-auto px-6 pb-[max(1.5rem,env(safe-area-inset-bottom))]">
+          {children}
+        </div>
       </div>
     </div>
   );

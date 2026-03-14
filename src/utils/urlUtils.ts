@@ -8,6 +8,14 @@ export function getShareUrlForCode(code: string): string {
 }
 
 /**
+ * Builds a strudel.cc URL with the given Strudel code base64-encoded in the hash.
+ */
+export function getStrudelCcUrlForCode(code: string): string {
+  const encoded = encodeURIComponent(btoa(code));
+  return `https://strudel.cc/#${encoded}`;
+}
+
+/**
  * Builds a share URL with the given track id in the hash.
  * Used for default playlist tracks.
  */

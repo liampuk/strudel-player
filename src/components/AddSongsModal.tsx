@@ -87,7 +87,7 @@ export default function AddSongsModal({
   };
 
   return (
-    <Modal isOpen={isOpen} onClose={onClose} title="Add song">
+    <Modal key={isOpen ? 'open' : 'closed'} isOpen={isOpen} onClose={onClose} title="Add song">
       <form onSubmit={handleSubmit} className="space-y-4">
         <div>
           <label
