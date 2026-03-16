@@ -29,7 +29,10 @@ interface PlaybackContextValue {
   toggleRepeat: () => void;
   shuffle: boolean;
   toggleShuffle: () => void;
-  playTrack: (track: Track, options?: { fromPrevious?: boolean; expandPlayer?: boolean }) => Promise<void>;
+  playTrack: (
+    track: Track,
+    options?: { fromPrevious?: boolean; expandPlayer?: boolean }
+  ) => Promise<void>;
   pushToHistory: (track: Track) => void;
   popFromHistory: () => Track | null;
   pause: () => void;
@@ -62,7 +65,10 @@ export function PlaybackProvider({
   const repeatRef = useRef(repeat);
   const currentTrackRef = useRef(currentTrack);
   const playTrackRef = useRef<
-    (track: Track, options?: { fromPrevious?: boolean; expandPlayer?: boolean }) => Promise<void>
+    (
+      track: Track,
+      options?: { fromPrevious?: boolean; expandPlayer?: boolean }
+    ) => Promise<void>
   >(() => Promise.resolve());
   const pauseRef = useRef(() => {});
   const playingRef = useRef(playing);
@@ -132,14 +138,12 @@ export function PlaybackProvider({
   }, []);
 
   const playTrack = useCallback(
-    async (track: Track, options?: { fromPrevious?: boolean; expandPlayer?: boolean }) => {
+    async (
+      track: Track,
+      options?: { fromPrevious?: boolean; expandPlayer?: boolean }
+    ) => {
       const isNewTrack = track !== currentTrack;
-      if (
-        isNewTrack &&
-        shuffle &&
-        !options?.fromPrevious &&
-        currentTrack
-      ) {
+      if (isNewTrack && shuffle && !options?.fromPrevious && currentTrack) {
         pushToHistory(currentTrack);
       }
       setCurrentTrack(track);
@@ -217,7 +221,9 @@ export function PlaybackProvider({
   };
 
   return (
-    <PlaybackContext.Provider value={value}>{children}</PlaybackContext.Provider>
+    <PlaybackContext.Provider value={value}>
+      {children}
+    </PlaybackContext.Provider>
   );
 }
 

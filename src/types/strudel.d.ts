@@ -84,6 +84,7 @@ declare module '@strudel/webaudio' {
 
 declare module 'superdough' {
   export function initAudioOnFirstClick(options?: unknown): Promise<void>;
+  export function loadWorklets(): Promise<void> | undefined;
   export function registerSynthSounds(): void;
   export function getAudioContext(): AudioContext;
   export function samples(

@@ -10,6 +10,25 @@ interface PlaylistProps {
   onDeleteTrack: (track: Track) => void;
 }
 
+const MENU_ESTIMATED_HEIGHT = 100;
+
+function getClipParent(element: HTMLElement): HTMLElement {
+  let parent = element.parentElement;
+  while (parent) {
+    const { overflow, overflowY } = getComputedStyle(parent);
+    if (
+      overflow.includes('hidden') ||
+      overflowY === 'auto' ||
+      overflowY === 'scroll' ||
+      overflowY === 'overlay'
+    ) {
+      return parent;
+    }
+    parent = parent.parentElement;
+  }
+  return document.documentElement as HTMLElement;
+}
+
 function TrackRow({
   track,
   isActive,
@@ -30,6 +49,7 @@ function TrackRow({
   onDelete: () => void;
 }) {
   const menuRef = useRef<HTMLDivElement>(null);
+  const [menuAbove, setMenuAbove] = useState(false);
 
   useEffect(() => {
     if (!menuOpen) return;
@@ -41,6 +61,17 @@ function TrackRow({
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen, onOpenMenu]);
+
+  useEffect(() => {
+    if (!menuOpen || !menuRef.current) return;
+    const row = menuRef.current.closest('[role="button"]') as HTMLElement;
+    if (!row) return;
+    const clipParent = getClipParent(row);
+    const rowRect = row.getBoundingClientRect();
+    const clipRect = clipParent.getBoundingClientRect();
+    const spaceBelow = clipRect.bottom - rowRect.bottom;
+    setMenuAbove(spaceBelow < MENU_ESTIMATED_HEIGHT);
+  }, [menuOpen]);
   return (
     <div
       role="button"
@@ -129,7 +160,9 @@ function TrackRow({
         </button>
         {menuOpen && (
           <div
-            className="absolute right-0 top-full mt-1 py-1 min-w-[140px] rounded-lg bg-[#282828] shadow-lg border border-white/10 z-50"
+            className={`absolute right-0 py-1 min-w-[140px] rounded-lg bg-[#282828] shadow-lg border border-white/10 z-300 ${
+              menuAbove ? 'bottom-full mb-1' : 'top-full mt-1'
+            }`}
             role="menu"
           >
             <button
@@ -291,7 +324,7 @@ export default function Playlist({
       </div>
 
       {/* Song list */}
-      <div className="flex-1 min-h-0 overflow-y-auto">
+      <div className="flex-1 min-h-0 overflow-y-auto pb-20 [scrollbar-width:none] [-ms-overflow-style:none] [&::-webkit-scrollbar]:hidden">
         <div
           role="button"
           tabIndex={0}

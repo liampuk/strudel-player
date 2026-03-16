@@ -20,29 +20,29 @@ function App() {
   return (
     <PlaybackProvider tracks={tracks}>
       <div className="h-full min-h-0 bg-[#090909] flex justify-center items-center overflow-hidden">
-        <div className="relative w-full md:max-w-[400px] h-full min-h-0 md:max-h-[min(824px,88vh)] md:p-[8px] md:border md:border-white/80 md:rounded-[36px] md:bg-black">
+        <div className="relative w-full md:max-w-[400px] h-full min-h-0 md:max-h-[min(824px,88vh)] md:p-[8px] md:border-2 md:border-white/80 md:rounded-[36px] md:bg-black">
           {/* Power button - right side */}
           <div
-            className="absolute -right-[4px] top-[25%] hidden h-16 w-[3px] -translate-y-1/2 rounded-r bg-white/80 md:block"
+            className="absolute -right-[5px] top-[25%] hidden h-16 w-[4px] -translate-y-1/2 rounded-r bg-white/80 md:block"
             aria-hidden
           />
           {/* Volume up - left side */}
           <div
-            className="absolute -left-[4px] top-[16%] hidden h-8 w-[3px] -translate-y-1/2 rounded-l bg-white/80 md:block"
+            className="absolute -left-[5px] top-[16%] hidden h-8 w-[4px] -translate-y-1/2 rounded-l bg-white/80 md:block"
             aria-hidden
           />
           {/* Volume up - left side */}
           <div
-            className="absolute -left-[4px] top-[25%] hidden h-12 w-[3px] -translate-y-1/2 rounded-l bg-white/80 md:block"
+            className="absolute -left-[5px] top-[25%] hidden h-12 w-[4px] -translate-y-1/2 rounded-l bg-white/80 md:block"
             aria-hidden
           />
           {/* Volume down - left side */}
           <div
-            className="absolute -left-[4px] top-[35%] hidden h-12 w-[3px] -translate-y-1/2 rounded-l bg-white/80 md:block"
+            className="absolute -left-[5px] top-[35%] hidden h-12 w-[4px] -translate-y-1/2 rounded-l bg-white/80 md:block"
             aria-hidden
           />
           <main className="relative w-full h-full min-h-0 flex flex-col overflow-hidden md:rounded-[24px] bg-[#121212]">
-            <div className="flex-1 min-h-0 overflow-hidden pb-20">
+            <div className="flex-1 min-h-0 overflow-hidden">
               <Playlist
                 tracks={tracks}
                 onOpenInfo={() => setShowInfoModal(true)}
@@ -61,12 +61,16 @@ function App() {
               <Player tracks={tracks} />
             </div>
             <InfoModal
-              key={showInfoModal ? 'open' : 'closed'}
+              key={showInfoModal ? 'info-modal-open' : 'info-modal-closed'}
               isOpen={showInfoModal}
               onClose={() => setShowInfoModal(false)}
             />
             <AddSongsModal
-              key={showAddSongsModal ? 'open' : 'closed'}
+              key={
+                showAddSongsModal
+                  ? 'add-songs-modal-open'
+                  : 'add-songs-modal-closed'
+              }
               isOpen={showAddSongsModal}
               onClose={() => {
                 setShowAddSongsModal(false);

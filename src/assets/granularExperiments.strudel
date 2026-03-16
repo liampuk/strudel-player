@@ -1,0 +1,53 @@
+//@title Granular Experiments @by SWITCH ANGEL
+
+// emulates a common DJ effect where you press a button, and a section of audio 
+// is repeated for a given duration
+register(
+  'beatRepeat',
+  (divisor, pat) => {
+       return pat.when(divisor.ceil(), (x) => {
+      return divisor.withHaps((haps) => {
+        return haps
+          .map((hap) => {
+            const divisorVal = Math.max(1, hap.value);
+
+            const lense = hap.whole.duration.div(divisorVal);
+            const lenseEnd = hap.whole.begin.add(lense);
+
+            const targetHaps = pat.queryArc(hap.part.begin, hap.part.end).filter((hap) => {
+              return hap.whole.begin.valueOf() < lenseEnd.valueOf();
+            });
+
+            const newHaps = Array.from({ length: divisorVal }, (_, i) => {
+              return targetHaps.map((hap) => {
+                return hap.withSpan((span) => {
+                  const durationAdjustment = lense.mul(i)                 
+                 const b = span.begin.add(durationAdjustment);
+                 const e = span.end.add(durationAdjustment)
+                   .min(b.add(lense));
+                  
+                 return new TimeSpan(b, e);
+                  // return span.withCycle((c) => c.add(durationAdjustment));
+                });
+              });
+            }).flat();
+
+            return newHaps;
+          })
+          .flat();
+      })
+     })
+  },
+  false,
+  true,
+);
+
+
+await samples('github:switchangel/pad')
+
+
+$: s("swpad:0").scrub(rand.seg(8).range(0.1,0.9)).beatRepeat(irand(16).seg(2))
+  .clip(rand).speed("-1 | 1 | 2".fast(2)).rel(rand.fast(2)).pan(rand).spectrum({speed: 20})
+
+
+// @version 1.1

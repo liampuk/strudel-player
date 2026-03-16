@@ -154,7 +154,7 @@ arrange(
       chordOrg
     ),
   ]
-);
+).pianoroll({fold:1});
 //.color("<pink cyan green orange>").punchcard({labels:1,vertical:1,flipTime:1,fill:0,strokeActive:1,filpValue:1,fontFamily:"teletext"})
 
 // `7MM"""Mq.`7MM"""YMM        db       .g8"""bgd `7MM"""YMM        .g8""8q. `7MMF"   `7MF"MMP""MM""YMM
