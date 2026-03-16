@@ -3,7 +3,9 @@
  * Same format as strudel.cc share links.
  */
 export function getShareUrlForCode(code: string): string {
-  const encoded = encodeURIComponent(btoa(code));
+  const encoded = encodeURIComponent(
+    btoa(String.fromCharCode(...new TextEncoder().encode(code)))
+  );
   return `${window.location.origin}${window.location.pathname}#${encoded}`;
 }
 
@@ -11,7 +13,9 @@ export function getShareUrlForCode(code: string): string {
  * Builds a strudel.cc URL with the given Strudel code base64-encoded in the hash.
  */
 export function getStrudelCcUrlForCode(code: string): string {
-  const encoded = encodeURIComponent(btoa(code));
+  const encoded = encodeURIComponent(
+    btoa(String.fromCharCode(...new TextEncoder().encode(code)))
+  );
   return `https://strudel.cc/#${encoded}`;
 }
 
@@ -20,7 +24,9 @@ export function getStrudelCcUrlForCode(code: string): string {
  * Used for default playlist tracks.
  */
 export function getShareUrlForTrackId(trackId: string): string {
-  return `${window.location.origin}${window.location.pathname}#id=${encodeURIComponent(trackId)}`;
+  return `${window.location.origin}${
+    window.location.pathname
+  }#id=${encodeURIComponent(trackId)}`;
 }
 
 /**

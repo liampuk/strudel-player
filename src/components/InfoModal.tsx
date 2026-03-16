@@ -13,12 +13,12 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
       onClose={onClose}
       title="About"
     >
-      <div className="space-y-4 text-sm text-white/80">
+      <div className="space-y-4 text-sm text-white/80 mb-8">
         <p>
           Streaming app for{' '}
           <a
             className="text-[#1DB954] font-semibold"
-            href="https://strudel.tidalcycles.org"
+            href="https://strudel.cc"
             target="_blank"
             rel="noopener noreferrer"
           >
@@ -34,14 +34,13 @@ export default function InfoModal({ isOpen, onClose }: InfoModalProps) {
           </span>
           .
         </p>
-        <div className="overflow-hidden rounded-sm">
+        <div className="overflow-hidden rounded-xl">
           <video
             src="/strudel-player/title-replace.mp4"
-            controls
             playsInline
             autoPlay
             loop
-            className="w-[calc(100%+2px)] -ml-0.5 rounded-sm"
+            className="w-[calc(100%+2px)] h-[56px] -ml-0.5"
           />
         </div>
         <p>

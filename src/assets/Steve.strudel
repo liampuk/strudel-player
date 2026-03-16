@@ -1,0 +1,125 @@
+setcpm(104/4)
+
+// Steel drums - full chords (enters bar 6)
+const steelDrums1 = note(`<
+  [~ ~ ~ ~ ~ ~ [d4,a4,d5] [d4,a4,d5]]
+  [[d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5]]
+  [[d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5]]
+  [[d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5]]
+  [[d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5]]
+  [[d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5]]
+  [[d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5]]
+  [[d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5] [d4,a4,d5]]
+>`).sound("gm_steel_drums")
+
+// Piano - full chords (enters bar 6)
+const piano1 = note(`<
+  [~ ~ ~ ~ ~ ~ [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+  [[d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+  [[d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+  [[d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+  [[d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+  [[d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+  [[d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+  [[d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6] [d4,a4,d5,e5,a5,d6]]
+>`).sound("piano")
+
+// Steel drums - alternating pattern (enters bar 4)
+const steelDrums2 = note(`<
+  ~ ~
+  [~ ~ ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5]]
+  [~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5]]
+  [~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5]]
+  [~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5]]
+  [~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5]]
+  [~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5]]
+  [~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5] ~ [d4,a4,d5]]
+>`).sound("gm_steel_drums")
+
+// Piano - alternating pattern (enters bar 4)
+const piano2 = note(`<
+  ~ ~
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+  [~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6] ~ [d4,a4,d5,d4,a4,d5,e5,a5,d6]]
+>`).sound("piano")
+
+// Violin (enters bar 8)
+const violin = note(`<
+  ~ ~ ~ ~
+  [~ ~ ~ ~ ~ ~ [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5]]
+  [[a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5]]
+  [[a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5]]
+  [[a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5]]
+  [[a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5]]
+  [[a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5]]
+  [[a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5] [a5,d5]]
+>`).sound("gm_violin")
+
+// Square bass (enters bar 10)
+const squareBass = note(`<
+  ~ ~ ~ ~ ~
+  [~ ~ ~ ~ ~ ~ ~ ~ [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3]]
+  [[d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3]]
+  [[d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~]
+  [~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [d3,a3] [d3,a3] [d3,a3] [d3,a3]]
+  [[d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3]]
+  [[d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3] [d3,a3]]
+>`).sound("square")
+
+// Square mid (enters bar 10)
+const squareMid = note(`<
+  ~ ~ ~ ~ ~
+  [~ ~ ~ ~ ~ ~ ~ ~ [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4]]
+  [[d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4]]
+  [[d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~]
+  [~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ ~ [d4,e4] [d4,e4]]
+  [[d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4]]
+  [[d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4] [d4,e4]]
+>`).sound("square")
+
+// Sci-fi layer (enters bar 12)
+const scifi = note(`<
+  ~ ~ ~ ~ ~ ~
+  [~ ~ [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] ~ ~ ~ ~]
+  ~
+  [~ ~ ~ ~ ~ ~ ~ ~ [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+>`).sound("gm_fx_sci_fi")
+
+// Cello (enters bar 14)
+const cello = note(`<
+  ~ ~ ~ ~ ~ ~ ~
+  [~ ~ [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+>`).sound("gm_cello")
+
+// Piano low (enters bar 16)
+const pianoLow = note(`<
+  ~ ~ ~ ~ ~ ~ ~ ~
+  [~ ~ ~ ~ [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+  [[f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2] [f#2,b2]]
+>`).sound("piano")
+
+// Arrangement - layers enter progressively
+arrange(
+  [4, stack(steelDrums2, piano2)],
+  [2, stack(steelDrums1, piano1, steelDrums2, piano2)],
+  [2, stack(steelDrums1, piano1, steelDrums2, piano2, violin)],
+  [2, stack(steelDrums1, piano1, steelDrums2, piano2, violin, squareBass, squareMid)],
+  [2, stack(steelDrums1, piano1, steelDrums2, piano2, violin, squareBass, squareMid, scifi)],
+  [2, stack(steelDrums1, piano1, steelDrums2, piano2, violin, squareBass, squareMid, scifi, cello)],
+  [2, stack(steelDrums1, piano1, steelDrums2, piano2, violin, squareBass, squareMid, scifi, cello, pianoLow)],
+  [16, stack(steelDrums1, piano1, steelDrums2, piano2, violin, squareBass, squareMid, scifi, cello, pianoLow)]
+)
