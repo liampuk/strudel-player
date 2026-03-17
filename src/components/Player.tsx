@@ -55,6 +55,39 @@ export default function Player({ tracks }: PlayerProps) {
     document.addEventListener('mousedown', handleClickOutside);
     return () => document.removeEventListener('mousedown', handleClickOutside);
   }, [menuOpen]);
+
+  useEffect(() => {
+    if (!('mediaSession' in navigator)) return;
+    if (!currentTrack) return;
+
+    const mediaSession = (
+      navigator as Navigator & { mediaSession?: MediaSession }
+    ).mediaSession;
+    if (!mediaSession || typeof MediaMetadata === 'undefined') return;
+
+    const artworkSrc = currentTrack.albumArt;
+    const artwork =
+      artworkSrc != null
+        ? [
+            {
+              src: artworkSrc,
+              sizes: '512x512',
+              type: artworkSrc.toLowerCase().endsWith('.png')
+                ? 'image/png'
+                : 'image/jpeg',
+            },
+          ]
+        : undefined;
+
+    mediaSession.metadata = new MediaMetadata({
+      title: currentTrack.title,
+      artist: currentTrack.artist,
+      album: 'Strudel Player',
+      artwork,
+    });
+
+    mediaSession.playbackState = playing ? 'playing' : 'paused';
+  }, [currentTrack, playing]);
   const containerRef = useRef<HTMLDivElement>(null);
   const fullPlayerRef = useRef<HTMLDivElement>(null);
   const dragStartYRef = useRef(0);
